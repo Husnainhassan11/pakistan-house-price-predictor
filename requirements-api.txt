@@ -1,0 +1,9 @@
+# Packages the API needs. The scikit-learn, pandas and numpy versions must match
+# the ones used to train the model, because the saved model file depends on them.
+fastapi
+uvicorn[standard]
+pydantic
+scikit-learn==1.9.1
+pandas==3.1.1
+numpy==2.5.4
+joblib==1.6.0

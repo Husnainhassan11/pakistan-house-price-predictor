@@ -79,40 +79,101 @@ Notebook: [`notebooks/02_eda_charts.ipynb`](notebooks/02_eda_charts.ipynb)
 
 Python, pandas, NumPy, Matplotlib, Seaborn, scikit-learn, Jupyter. Planned: XGBoost, FastAPI, Streamlit, Next.js, Vercel.
 
-## Project structure
 
-```
+Model
+
+Notebook: notebooks/03_modeling.ipynb | Training script: src/train.py
+
+Features (all things a user can type into a website): property type, city, location, area, bedrooms and baths. Method: the models learn the log of the price. Categories are one-hot encoded, and rare locations (fewer than 30 listings) are grouped together. All scores are measured on 16,071 houses the model never saw during training.
+
+Model comparison
+Model	MAE (crore)	RMSE (crore)	R² (price)	Median % error
+Dummy baseline (always the typical price)	1.557	2.884	-0.121	60.0%
+Linear Regression	0.547	1.137	0.826	18.4%
+Random Forest	0.480	1.005	0.864	15.2%
+Gradient Boosting	0.475	0.988	0.868	15.4%
+
+Random Forest and Gradient Boosting are almost tied. I deploy Gradient Boosting because it wins on four of five metrics and its saved model is 1.5 MB, compared with 147.6 MB for Random Forest.
+
+Final model results (Gradient Boosting)
+Metric	Result
+R² (price)	0.868
+Median error	15.4%
+Mean absolute error	0.475 crore PKR
+Predictions within 10% of the real price	33.6%
+Predictions within 20% of the real price	60.9%
+Predictions within 30% of the real price	77.0%
+
+The API also returns a price range, because one number looks more certain than it is: 80% of real prices fell between 0.72x and 1.39x the prediction.
+
+Evaluation charts (from the Random Forest run in notebook 03)
+
+Model errors Feature importance
+
+Most important features: area (log_area 0.241 and area_marla 0.233, the same information in two forms), then location (city_location 0.132 and city 0.101), then property type (0.053), bedrooms (0.050) and baths (0.032).
+
+Limitations
+Very expensive houses (above about 10 crore) are under-predicted
+Rare property types such as Penthouse and Farm House have errors above 30%, because there are few examples
+The data covers 2018 to 2019, so today's prices are different and the model needs fresh data
+The test set is a random split, so similar houses from the same project may appear in both sets
+API
+
+Code: api/main.py (FastAPI)
+
+Endpoint	Purpose
+GET /	Health check
+GET /options	Cities, property types, locations and model scores (for website dropdowns)
+POST /predict	Predict the price of one house
+
+Example request:
+
+json
+{"property_type": "Flat", "city": "Islamabad", "location": "G-10",
+ "area_marla": 5, "bedrooms": 2, "baths": 1}
+
+Example response:
+
+json
+{
+  "price_pkr": 7702000,
+  "price_crore": 0.77,
+  "low_pkr": 5538000,
+  "high_pkr": 10729000,
+  "low_crore": 0.55,
+  "high_crore": 1.07,
+  "note": null
+}
+
+Unknown cities or property types return a clear 422 error, and an unknown location still returns a price with a warning in note.
+
+Project structure
 pakistan-house-price-predictor/
-├── data/                 # raw and cleaned CSVs (not tracked by Git)
-├── images/               # charts saved by the EDA notebook
+├── api/
+│   └── main.py               # FastAPI backend
+├── data/                     # raw and cleaned CSVs (not tracked by Git)
+├── images/                   # charts saved by the notebooks
+├── models/
+│   ├── house_price_model.joblib   # trained Gradient Boosting pipeline (1.5 MB)
+│   └── options.json               # dropdown values, scores and price range
 ├── notebooks/
-│   ├── 01_eda.ipynb          # cleaning
-│   └── 02_eda_charts.ipynb   # charts and insights
+│   ├── 01_eda.ipynb          # data cleaning
+│   ├── 02_eda_charts.ipynb   # charts and insights
+│   └── 03_modeling.ipynb     # model training and evaluation
 ├── src/
+│   ├── house_model.py        # shared feature and prediction code
+│   └── train.py              # trains and saves the final model
 ├── requirements.txt
+├── requirements-api.txt
 └── README.md
-```
 
-## How to run
 
-1. Clone the repository and create a virtual environment:
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate        # Windows
-   pip install -r requirements.txt
-   ```
-2. Download the CSV from Kaggle and save it as `data/zameen-updated.csv`
-3. Run `notebooks/01_eda.ipynb` from top to bottom. It creates `data/cleaned_house_prices.csv`
-4. Run `notebooks/02_eda_charts.ipynb`
 
-## Roadmap
 
-- [x] Data cleaning
-- [x] Exploratory data analysis
-- [ ] Model training and comparison (Linear Regression, Random Forest, XGBoost)
-- [ ] FastAPI prediction API
-- [ ] Streamlit demo
-- [ ] Next.js frontend deployed on Vercel
+
+
+
+
 
 ## Author
 
