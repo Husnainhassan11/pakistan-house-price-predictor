@@ -221,3 +221,5 @@ __marimo__/
 
 data/*.csvgit status
 data/*.csv
+
+models/*.joblib

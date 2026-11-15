@@ -1,0 +1,50 @@
+{
+  "best_model": "Random Forest",
+  "features": [
+    "area_marla",
+    "log_area",
+    "bedrooms",
+    "baths",
+    "property_type",
+    "city",
+    "city_location"
+  ],
+  "results": [
+    {
+      "Model": "Random Forest",
+      "MAE (crore)": 0.4798,
+      "RMSE (crore)": 1.0045,
+      "R2 (price)": 0.864,
+      "R2 (log price)": 0.8893,
+      "Median % error": 15.2199,
+      "Seconds": 26.4093
+    },
+    {
+      "Model": "Gradient Boosting",
+      "MAE (crore)": 0.475,
+      "RMSE (crore)": 0.9882,
+      "R2 (price)": 0.8684,
+      "R2 (log price)": 0.8958,
+      "Median % error": 15.4042,
+      "Seconds": 20.389
+    },
+    {
+      "Model": "Linear Regression",
+      "MAE (crore)": 0.5475,
+      "RMSE (crore)": 1.1372,
+      "R2 (price)": 0.8257,
+      "R2 (log price)": 0.8649,
+      "Median % error": 18.4129,
+      "Seconds": 1.7738
+    },
+    {
+      "Model": "Dummy baseline",
+      "MAE (crore)": 1.5574,
+      "RMSE (crore)": 2.8842,
+      "R2 (price)": -0.121,
+      "R2 (log price)": -0.004,
+      "Median % error": 60.0,
+      "Seconds": 0.29
+    }
+  ]
+}
