@@ -1,0 +1,6 @@
+# Packages for the Streamlit demo. Versions must match the ones used to train the model.
+streamlit
+scikit-learn==1.9.1
+pandas==3.1.1
+numpy==2.5.4
+joblib==1.6.0
