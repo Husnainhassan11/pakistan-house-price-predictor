@@ -2,12 +2,11 @@
 
 Predicts house **sale prices** in Pakistani cities from the property type, city, location, area, bedrooms and bathrooms, and returns a likely price range.
 
-**Live demo (Streamlit):** https://YOUR-APP-NAME.streamlit.app
+**Live demo (Streamlit):** https://https://pakistan-house-price-predictor-hh.streamlit.app
+
 **Live API (FastAPI docs):** https://pakistan-house-price-predictor.onrender.com/docs
 
 > The API runs on a free plan and sleeps when unused. The first request can take 30 to 60 seconds to wake it up.
-
-![Streamlit demo](images/streamlit_demo.png)
 
 **Status:** Data cleaning, analysis, model, API and Streamlit demo are done and deployed. A Next.js frontend on Vercel is next.
 
