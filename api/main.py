@@ -4,6 +4,7 @@ Run from the project root:   uvicorn api.main:app --reload
 Then open:                   http://127.0.0.1:8000/docs
 """
 import json
+import os
 from pathlib import Path
 
 import joblib
@@ -29,10 +30,13 @@ app = FastAPI(
 )
 
 # CORS lets a website (the Next.js frontend) call this API from the browser.
-# Later we will add the Vercel address to this list.
+# The allowed websites come from the ALLOWED_ORIGINS setting (separated by commas).
+# Locally it defaults to the Next.js dev server; online we add the Vercel address.
+allowed_origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
