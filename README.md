@@ -4,7 +4,7 @@ An end-to-end machine learning project: it predicts house **sale prices** in Pak
 
 | | Link |
 |---|---|
-| **Website (Next.js on Vercel)** | https://YOUR-VERCEL-APP.vercel.app |
+| **Website (Next.js on Vercel)** | https://pakistan-house-price-predictor-blush.vercel.app |
 | **Streamlit demo** | https://pakistan-house-price-predictor-hh.streamlit.app/ |
 | **API docs (FastAPI on Render)** | https://pakistan-house-price-predictor.onrender.com/docs |
 
