@@ -1,17 +1,37 @@
 # Pakistan House Price Predictor
 
-Predicts house **sale prices** in Pakistani cities from the property type, city, location, area, bedrooms and bathrooms, and returns a likely price range.
+An end-to-end machine learning project: it predicts house **sale prices** in Pakistani cities from the property type, city, location, area, bedrooms and bathrooms, and returns a likely price range.
 
-**Live demo (Streamlit):** https://YOUR-APP-NAME.streamlit.app
-**Live API (FastAPI docs):** https://pakistan-house-price-predictor.onrender.com/docs
+| | Link |
+|---|---|
+| **Website (Next.js on Vercel)** | https://YOUR-VERCEL-APP.vercel.app |
+| **Streamlit demo** | https://pakistan-house-price-predictor-hh.streamlit.app/ |
+| **API docs (FastAPI on Render)** | https://pakistan-house-price-predictor.onrender.com/docs |
 
 > The API runs on a free plan and sleeps when unused. The first request can take 30 to 60 seconds to wake it up.
 
 ![Streamlit demo](images/streamlit_demo.png)
 
-**Status:** Data cleaning, analysis, model, API and Streamlit demo are done and deployed. A Next.js frontend on Vercel is next.
+**What this project covers:** data cleaning, exploratory analysis, model training and comparison, a REST API, two web interfaces, and cloud deployment.
 
-**Pipeline:** cleaned data, trained model, FastAPI backend (deployed on Render), Streamlit demo (deployed on Streamlit Community Cloud), Next.js frontend on Vercel (planned).
+---
+
+## How it works
+
+```
+                     +-------------------------+
+ Browser  ---------> | Next.js website         |
+                     | (Vercel)                |
+                     +------------+------------+
+                                  | POST /predict
+                                  v
+                     +-------------------------+      loads
+                     | FastAPI backend         | <---------- models/house_price_model.joblib
+                     | (Render)                |             models/options.json
+                     +-------------------------+
+
+ Browser  ---------> Streamlit demo (Streamlit Community Cloud), loads the same model directly
+```
 
 ---
 
@@ -96,7 +116,7 @@ Random Forest and Gradient Boosting are almost tied. I deploy **Gradient Boostin
 | Predictions within 20% of the real price | 60.9% |
 | Predictions within 30% of the real price | 77.0% |
 
-The API and the demo also return a price range, because one number looks more certain than it is: 80% of real prices fell between **0.72x and 1.39x** the prediction.
+The API and both web interfaces also return a price range, because one number looks more certain than it is: 80% of real prices fell between **0.72x and 1.39x** the prediction.
 
 ### Evaluation charts (from the Random Forest run in notebook 03)
 
@@ -143,7 +163,19 @@ Code: [`api/main.py`](api/main.py) (FastAPI) | Live docs: https://pakistan-house
 }
 ```
 
-Unknown cities or property types return a clear `422` error, and an unknown location still returns a price with a warning in `note`.
+Input is validated with Pydantic. Unknown cities or property types return a clear `422` error, and an unknown location still returns a price with a warning in `note`.
+
+---
+
+## Web interfaces
+
+### Next.js website (`frontend/`)
+
+Built with Next.js (App Router), React and Tailwind CSS. It loads the dropdown values from the API, sends the form to `POST /predict`, and shows the price with a range bar. It handles the free server's slow start with a waiting message and retries, validates the form, and shows clear error messages.
+
+### Streamlit demo (`streamlit_app/`)
+
+A quick Python interface with the same inputs. It loads the model directly, so it does not need the API.
 
 ---
 
@@ -152,10 +184,11 @@ Unknown cities or property types return a clear `422` error, and an unknown loca
 | Part | Where | Notes |
 |---|---|---|
 | FastAPI backend | Render (free plan) | Build: `pip install -r requirements-api.txt`. Start: `uvicorn api.main:app --host 0.0.0.0 --port $PORT`. Python version set with the `PYTHON_VERSION` environment variable |
+| Next.js website | Vercel | Root directory: `frontend` |
 | Streamlit demo | Streamlit Community Cloud | Main file: `streamlit_app/app.py`, with its own `streamlit_app/requirements.txt` |
-| Next.js frontend | Vercel (planned) | Will call the Render API |
 
-- The websites allowed to call the API are set with the `ALLOWED_ORIGINS` environment variable (comma separated). It defaults to `http://localhost:3000`.
+- The websites allowed to call the API are set with the `ALLOWED_ORIGINS` environment variable on Render (comma separated). It defaults to `http://localhost:3000`.
+- The frontend reads the API address from `NEXT_PUBLIC_API_URL`, which defaults to the Render API.
 - The model file is small (1.5 MB), so it is stored in the repository.
 - Package versions (scikit-learn, pandas, numpy, joblib) are pinned, because a saved model depends on the versions used to train it.
 
@@ -168,6 +201,10 @@ pakistan-house-price-predictor/
 ├── api/
 │   └── main.py                    # FastAPI backend
 ├── data/                          # raw and cleaned CSVs (not tracked by Git)
+├── frontend/                      # Next.js website
+│   └── app/
+│       ├── layout.js
+│       └── page.js
 ├── images/                        # charts and screenshots
 ├── models/
 │   ├── house_price_model.joblib   # trained Gradient Boosting pipeline (1.5 MB)
@@ -189,6 +226,8 @@ pakistan-house-price-predictor/
 
 ## How to run locally
 
+**Python side (model, API, Streamlit)**
+
 1. Clone the repository and create a virtual environment:
    ```bash
    python -m venv venv
@@ -203,16 +242,26 @@ pakistan-house-price-predictor/
 5. Start the API from the project root: `uvicorn api.main:app --reload`, then open http://127.0.0.1:8000/docs
 6. Start the Streamlit demo from the project root: `streamlit run streamlit_app/app.py`
 
+**Website (Node.js 20 or newer)**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open http://localhost:3000. By default it calls the deployed API. To use a local API instead, create `frontend/.env.local` with `NEXT_PUBLIC_API_URL=http://127.0.0.1:8000`.
+
 ## Roadmap
 
 - [x] Data cleaning
 - [x] Exploratory data analysis
 - [x] Model training and comparison
-- [x] FastAPI prediction API
+- [x] FastAPI prediction API (deployed on Render)
 - [x] Streamlit demo (deployed)
-- [x] API deployed online (Render)
-- [ ] Next.js frontend deployed on Vercel
-- [ ] Cross-validation, tuning, and a milder duplicate rule
+- [x] Next.js website (deployed on Vercel)
+- [ ] Cross-validation, hyperparameter tuning and XGBoost
+- [ ] Test a milder duplicate rule
+- [ ] Retrain with newer data
 
 ## Author
 
